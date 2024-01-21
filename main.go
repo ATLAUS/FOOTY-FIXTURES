@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -39,12 +40,28 @@ func main() {
 
 	defer response.Body.Close()
 
-	// Need to adjust to make a little more elegant
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		fmt.Println("Error reading body:", err)
 	}
 
-	fmt.Println(string(body))
+	//	EXPERIMENTAL	//
+	type Fixture struct {
+		Fixtures []string `json:"fixtures"`
+		Error    string   `json:"error"`
+	}
 
+	var fixture Fixture
+
+	err = json.Unmarshal(body, &fixture)
+	if err != nil {
+		fmt.Println("Error unmarshalling json", err)
+	}
+
+	if fixture.Error == "" {
+		fmt.Println(fixture.Fixtures)
+	} else {
+		fmt.Println(fixture.Error)
+	}
+	//	END EXPERIMENTAL	//
 }
